@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<title>日历demo</title>
+	 <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+	<script src="http://apps.bdimg.com/libs/jquery/2.0.0/jquery.min.js"></script>
+	<style type="text/css">
+		table,table tr th, table tr td { border:1px solid #0094ff; }
+        table { width: 200px; min-height: 25px; line-height: 25px; text-align: center; border-collapse: collapse;}   
+	</style>
+</head>
+<body>
+	<div style="margin: 0 auto; margin-top: 50px; margin-left: 500px;">
+		<div id="selects">
+			<select id = "monthe" style="margin-bottom: 20px; width: 200px;">
+				<option value="01">一月</option>
+				<option value="02">二月</option>
+				<option value="03">三月</option>
+				<option value="04">四月</option>
+				<option value="05">五月</option>
+				<option value="06">六月</option>
+				<option value="07">七月</option>
+				<option value="08">八月</option>
+				<option value="09">九月</option>
+				<option value="10">十月</option>
+				<option value="11">十一月</option>
+				<option value="12">十二月</option>
+			</select>
+		</div>
+		<div>
+			<table id = 'rili' width="400" border="0" cellspacing="0" cellpadding="0">
+			</table>
+		</div>
+	</div>
+	<script>
+		var weekData = [6,0,1,2,3,4,5]
+		var date = new Array(42); //定义展示数组
+		var dateTime = new Date()
+		var Year = dateTime.getFullYear()
+		var newMon = getMothDay(dateTime.getMonth() + 1)
+		//初始化
+		$(document).ready(function(){
+			$("#monthe").val(newMon)
+			getCalemder(newMon)
+			getTable()
+		})
+
+		$("#monthe").change(function(){
+			var mon = getMothDay($("#monthe").val())
+			Year = dateTime.getFullYear()
+			getCalemder(mon)
+			getTable()
+		})
+		function getMothDay(mon){
+			if ( 0 < mon < 10){
+				mon = '0' + mon
+			}
+			return mon
+		}
+		function getCalemder(mon){
+			var TheMon = {'Year':Year,'Mon':mon} //当月
+			var LastMon = getLastMon(mon) //上一个月
+			var TheMonDay = getDateMonDay(TheMon) //当月多少天 
+			var LastMonDay = getDateMonDay(LastMon) //上个月多少天
+			var theMonWeek = weekData[new Date(TheMon.Year + '-' + TheMon.Mon + '-01').getDay()] //判断属于星期几，然后获取当月的1号是在date数组中，下标是多少
+			var EndDayNum = TheMonDay + theMonWeek
+			for(var i = 0; i < date.length; i++){
+				var day = i+1 //因为数组从0 开始,为了对应天数，所以需要加1
+				if(i<theMonWeek){
+					day = LastMonDay - theMonWeek + day
+				}else if (theMonWeek <= i && i < EndDayNum) {
+					day = day - theMonWeek
+				}else if(EndDayNum <= i){
+					day = day - EndDayNum
+				}
+				date[i] = day
+			}
+			console.log(date)
+		}
+		function getLastMon(mon){
+			var reult = {}
+			if(mon > 1 && mon <= 12){
+ 				mon = mon - 1
+			}else if(mon == 1){
+				Year = Year - 1
+				mon = 1
+			}
+			reult.Mon = mon
+			reult.Year = Year
+			return  reult
+		}
+		function getDateMonDay(curDate){
+		    var curDate = new Date(curDate.Year,curDate.Mon,0);
+		    /* 返回当月的天数 */
+		    return curDate.getDate();
+		}
+		function getTable(){
+			$("table tr").remove();
+			var num = date.length
+			var str = '<tr><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th><th>日</th></tr>'
+			var td = ''
+
+			for(i=0;i<num;i++){
+				td += ' <td>'+date[i]+'</td> '
+				if((i+1)%7 == 0 && i > 0){
+					td  = ' <tr> '+ td + ' </tr>'
+					str += td
+					td  = ''
+
+				}
+			}
+			$("#rili").append(str)
+			console.log(str)
+		}
+	</script>
+</body>
+</html>
